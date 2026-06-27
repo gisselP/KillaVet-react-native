@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Killa Vet",
+    "slug": "killa-vet",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#E1F5EE"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.killavet.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#E1F5EE"
+      },
+      "package": "com.killavet.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": []
+  }
+}
