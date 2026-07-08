@@ -17,7 +17,7 @@ import InputField from '../components/InputField';
 import Button from '../components/Button';
 import SpeciesSelector from '../components/SpeciesSelector';
 import { colors, spacing, radius } from '../theme/colors';
-import { RootStackParamList, Patient } from '../types';
+import { RootStackParamList, Patient, PrioridadPaciente, TIPOS_SERVICIO } from '../types';
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'RegisterPatient'>;
@@ -51,6 +51,8 @@ export default function RegisterPatientScreen({ navigation }: Props) {
   const [direccion, setDireccion] = useState('');
   const [motivoConsulta, setMotivoConsulta] = useState('');
   const [observaciones, setObservaciones] = useState('');
+  const [tipoServicio, setTipoServicio] = useState<string>(TIPOS_SERVICIO[0]);
+  const [prioridad, setPrioridad] = useState<PrioridadPaciente>('MEDIA');
   const [errors, setErrors] = useState<FormErrors>({});
 
   function validate(): boolean {
@@ -87,6 +89,9 @@ export default function RegisterPatientScreen({ navigation }: Props) {
         telefono: telefono.trim(),
         email: email.trim(),
         direccion: direccion.trim(),
+        tipoServicio,
+        prioridad,
+        estado: 'PENDIENTE',
         motivoConsulta: motivoConsulta.trim(),
         observaciones: observaciones.trim(),
       });
@@ -131,6 +136,48 @@ export default function RegisterPatientScreen({ navigation }: Props) {
           <View style={styles.section}>
             <SectionLabel icon="🐾" label="Especie" />
             <SpeciesSelector value={especie} onChange={setEspecie} />
+          </View>
+
+          <View style={styles.section}>
+            <SectionLabel icon="🏥" label="Tipo de atención" />
+            <Text style={styles.fieldLabel}>Tipo de servicio</Text>
+            <View style={styles.chipsGrid}>
+              {(TIPOS_SERVICIO as readonly string[]).map((tipo) => (
+                <TouchableOpacity
+                  key={tipo}
+                  onPress={() => setTipoServicio(tipo)}
+                  style={[styles.chip, tipoServicio === tipo && styles.chipSelected]}
+                >
+                  <Text style={[styles.chipText, tipoServicio === tipo && styles.chipTextSelected]}>
+                    {tipo}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Text style={[styles.fieldLabel, { marginTop: spacing.sm }]}>Prioridad</Text>
+            <View style={styles.sexRow}>
+              {(['BAJA', 'MEDIA', 'ALTA'] as PrioridadPaciente[]).map((p) => (
+                <TouchableOpacity
+                  key={p}
+                  onPress={() => setPrioridad(p)}
+                  style={[
+                    styles.sexOption,
+                    prioridad === p && styles.sexOptionSelected,
+                    prioridad === p && p === 'ALTA'
+                      ? { backgroundColor: '#FEE2E2', borderColor: '#E24B4A' }
+                      : undefined,
+                    prioridad === p && p === 'MEDIA'
+                      ? { backgroundColor: '#FEF3C7', borderColor: '#D97706' }
+                      : undefined,
+                  ]}
+                >
+                  <Text style={[styles.sexOptionText, prioridad === p && styles.sexOptionTextSelected]}>
+                    {p}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
 
           <View style={styles.section}>
@@ -396,6 +443,33 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   sexOptionTextSelected: {
+    color: colors.primaryDark,
+    fontWeight: '700',
+  },
+  chipsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  chip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    backgroundColor: colors.background,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  chipSelected: {
+    backgroundColor: colors.primaryLight,
+    borderColor: colors.primary,
+  },
+  chipText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.textSecondary,
+  },
+  chipTextSelected: {
     color: colors.primaryDark,
     fontWeight: '700',
   },

@@ -5,6 +5,24 @@ import { SPECIES_EMOJI } from './SpeciesSelector';
 import { usePatients } from '../context/PatientContext';
 import { Patient } from '../types';
 
+const ESTADO_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
+  PENDIENTE:   { bg: '#FEF3C7', text: '#92400E', label: 'PENDIENTE' },
+  EN_ATENCION: { bg: '#DBEAFE', text: '#1E40AF', label: 'EN ATENCIÓN' },
+  FINALIZADO:  { bg: '#E1F5EE', text: '#0F6E56', label: 'FINALIZADO' },
+};
+
+const PRIORIDAD_CONFIG: Record<string, { bg: string; text: string }> = {
+  BAJA:  { bg: '#F3F4F6', text: '#6B7280' },
+  MEDIA: { bg: '#FEF3C7', text: '#92400E' },
+  ALTA:  { bg: '#FEE2E2', text: '#991B1B' },
+};
+
+const ESTADO_BORDER: Record<string, string> = {
+  PENDIENTE:   '#D97706',
+  EN_ATENCION: '#3B82F6',
+  FINALIZADO:  '#1D9E75',
+};
+
 interface Props {
   patient: Patient;
   onPress: () => void;
@@ -29,13 +47,17 @@ export default function PatientCard({ patient, onPress }: Props) {
   }
 
   const emoji = SPECIES_EMOJI[patient.especie] ?? '🐾';
+  const estado = patient.estado ?? 'PENDIENTE';
+  const prioridad = patient.prioridad ?? 'BAJA';
+  const ec = ESTADO_CONFIG[estado];
+  const pc = PRIORIDAD_CONFIG[prioridad];
 
   return (
     <TouchableOpacity
       onPress={onPress}
       onLongPress={handleLongPress}
       activeOpacity={0.7}
-      style={styles.card}
+      style={[styles.card, { borderLeftColor: ESTADO_BORDER[estado] }]}
     >
       <View style={styles.avatarContainer}>
         <Text style={styles.avatarEmoji}>{emoji}</Text>
@@ -50,6 +72,14 @@ export default function PatientCard({ patient, onPress }: Props) {
         <Text style={styles.ownerName} numberOfLines={1}>
           👤 {patient.nombreDueno}
         </Text>
+        <View style={styles.chipsRow}>
+          <View style={[styles.chip, { backgroundColor: ec.bg }]}>
+            <Text style={[styles.chipText, { color: ec.text }]}>{ec.label}</Text>
+          </View>
+          <View style={[styles.chip, { backgroundColor: pc.bg }]}>
+            <Text style={[styles.chipText, { color: pc.text }]}>{prioridad}</Text>
+          </View>
+        </View>
       </View>
 
       <View style={styles.right}>
@@ -129,5 +159,19 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 11,
     color: colors.textMuted,
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    gap: 4,
+    marginTop: 5,
+  },
+  chip: {
+    borderRadius: radius.full,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+  },
+  chipText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
 });

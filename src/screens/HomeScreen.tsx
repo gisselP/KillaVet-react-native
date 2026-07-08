@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -14,12 +15,31 @@ import PatientCard from '../components/PatientCard';
 import { colors, spacing, radius } from '../theme/colors';
 import { RootStackParamList, Patient } from '../types';
 
+const FILTROS = [
+  { value: 'TODOS',       label: 'Todos',       bg: '#E1F5EE', border: '#1D9E75', text: '#0F6E56' },
+  { value: 'PENDIENTE',   label: 'Pendiente',   bg: '#FEF3C7', border: '#D97706', text: '#92400E' },
+  { value: 'EN_ATENCION', label: 'En atención', bg: '#DBEAFE', border: '#3B82F6', text: '#1E40AF' },
+  { value: 'FINALIZADO',  label: 'Finalizado',  bg: '#E1F5EE', border: '#1D9E75', text: '#0F6E56' },
+] as const;
+
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
 };
 
 export default function HomeScreen({ navigation }: Props) {
   const { patients, loading } = usePatients();
+  const [search, setSearch] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState('TODOS');
+
+  const filteredPatients = patients.filter((p) => {
+    const q = search.trim().toLowerCase();
+    const matchesSearch =
+      q === '' ||
+      p.nombre.toLowerCase().includes(q) ||
+      p.nombreDueno.toLowerCase().includes(q);
+    const matchesEstado = filtroEstado === 'TODOS' || p.estado === filtroEstado;
+    return matchesSearch && matchesEstado;
+  });
 
   function renderHeader() {
     return (
@@ -69,22 +89,70 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        {patients.length > 0 && (
-          <Text style={styles.sectionTitle}>Pacientes registrados</Text>
+        {/* Buscador */}
+        <View style={styles.searchContainer}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar por mascota o dueño..."
+            placeholderTextColor={colors.textMuted}
+            value={search}
+            onChangeText={setSearch}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity onPress={() => setSearch('')} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={styles.searchClear}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {/* Filtros de estado */}
+        <View style={styles.filtersRow}>
+          {FILTROS.map((f) => (
+            <TouchableOpacity
+              key={f.value}
+              onPress={() => setFiltroEstado(f.value)}
+              style={[
+                styles.filterChip,
+                filtroEstado === f.value && { backgroundColor: f.bg, borderColor: f.border },
+              ]}
+            >
+              <Text style={[
+                styles.filterChipText,
+                filtroEstado === f.value && { color: f.text, fontWeight: '700' },
+              ]}>
+                {f.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {filteredPatients.length > 0 && (
+          <Text style={styles.sectionTitle}>
+            {filteredPatients.length}{' '}
+            {filteredPatients.length === 1 ? 'paciente' : 'pacientes'}
+          </Text>
         )}
       </>
     );
   }
 
   function renderEmpty() {
+    const isFiltered = search.trim() !== '' || filtroEstado !== 'TODOS';
     return (
       <View style={styles.emptyState}>
         <View style={styles.emptyIconContainer}>
-          <Text style={styles.emptyEmoji}>🐾</Text>
+          <Text style={styles.emptyEmoji}>{isFiltered ? '🔍' : '🐾'}</Text>
         </View>
-        <Text style={styles.emptyTitle}>Sin pacientes aún</Text>
+        <Text style={styles.emptyTitle}>
+          {isFiltered ? 'Sin resultados' : 'Sin pacientes aún'}
+        </Text>
         <Text style={styles.emptySub}>
-          Registra tu primer paciente con el botón de abajo
+          {isFiltered
+            ? 'Prueba con otro texto o filtro'
+            : 'Registra tu primer paciente con el botón de abajo'}
         </Text>
       </View>
     );
@@ -101,7 +169,7 @@ export default function HomeScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
       <FlatList<Patient>
-        data={patients}
+        data={filteredPatients}
         keyExtractor={(item) => item.id}
         ListHeaderComponent={renderHeader}
         ListEmptyComponent={renderEmpty}
@@ -232,6 +300,51 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 3,
     lineHeight: 14,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.white,
+    borderRadius: radius.md,
+    marginHorizontal: spacing.lg,
+    marginBottom: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  searchIcon: {
+    fontSize: 15,
+    marginRight: spacing.sm,
+  },
+  searchInput: {
+    flex: 1,
+    height: 44,
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  searchClear: {
+    fontSize: 13,
+    color: colors.textMuted,
+    paddingLeft: spacing.sm,
+  },
+  filtersRow: {
+    flexDirection: 'row',
+    paddingHorizontal: spacing.lg,
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  filterChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    backgroundColor: colors.white,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  filterChipText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textMuted,
   },
   sectionTitle: {
     fontSize: 12,

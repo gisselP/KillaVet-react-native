@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Patient } from '../types';
+import { Patient, EstadoPaciente } from '../types';
 
 type PatientInput = Omit<Patient, 'id' | 'fechaRegistro' | 'horaRegistro'>;
 
@@ -8,6 +8,7 @@ interface PatientContextType {
   patients: Patient[];
   loading: boolean;
   addPatient: (data: PatientInput) => Promise<Patient>;
+  updateEstado: (id: string, estado: EstadoPaciente) => void;
   deletePatient: (id: string) => Promise<void>;
 }
 
@@ -63,6 +64,12 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     return newPatient;
   }
 
+  function updateEstado(id: string, estado: EstadoPaciente): void {
+    const updated = patients.map((p) => (p.id === id ? { ...p, estado } : p));
+    setPatients(updated);
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated)).catch(() => {});
+  }
+
   async function deletePatient(id: string): Promise<void> {
     const updated = patients.filter((p) => p.id !== id);
     setPatients(updated);
@@ -74,7 +81,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <PatientContext.Provider value={{ patients, loading, addPatient, deletePatient }}>
+    <PatientContext.Provider value={{ patients, loading, addPatient, updateEstado, deletePatient }}>
       {children}
     </PatientContext.Provider>
   );

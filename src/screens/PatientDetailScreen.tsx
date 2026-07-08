@@ -13,7 +13,19 @@ import { RouteProp } from '@react-navigation/native';
 import { usePatients } from '../context/PatientContext';
 import { SPECIES_EMOJI } from '../components/SpeciesSelector';
 import { colors, spacing, radius } from '../theme/colors';
-import { RootStackParamList } from '../types';
+import { RootStackParamList, EstadoPaciente } from '../types';
+
+const ESTADO_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
+  PENDIENTE:   { bg: '#FEF3C7', text: '#92400E', label: 'PENDIENTE' },
+  EN_ATENCION: { bg: '#DBEAFE', text: '#1E40AF', label: 'EN ATENCIÓN' },
+  FINALIZADO:  { bg: '#E1F5EE', text: '#0F6E56', label: 'FINALIZADO' },
+};
+
+const PRIORIDAD_CONFIG: Record<string, { bg: string; text: string }> = {
+  BAJA:  { bg: '#F3F4F6', text: '#6B7280' },
+  MEDIA: { bg: '#FEF3C7', text: '#92400E' },
+  ALTA:  { bg: '#FEE2E2', text: '#991B1B' },
+};
 
 type Props = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'PatientDetail'>;
@@ -21,8 +33,11 @@ type Props = {
 };
 
 export default function PatientDetailScreen({ navigation, route }: Props) {
-  const { patient } = route.params;
-  const { deletePatient } = usePatients();
+  const { patient: paramPatient } = route.params;
+  const { patients, deletePatient, updateEstado } = usePatients();
+
+  // Leer el paciente en vivo para que los cambios de estado se reflejen al instante
+  const patient = patients.find((p) => p.id === paramPatient.id) ?? paramPatient;
 
   function handleDelete() {
     Alert.alert(
@@ -86,6 +101,42 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.card}>
+          <CardTitle icon="🏥" title="Estado de atención" />
+          <InfoRow label="Tipo de servicio" value={patient.tipoServicio ?? 'Consulta'} />
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Prioridad</Text>
+            <View style={[styles.chip, { backgroundColor: PRIORIDAD_CONFIG[patient.prioridad ?? 'BAJA'].bg }]}>
+              <Text style={[styles.chipText, { color: PRIORIDAD_CONFIG[patient.prioridad ?? 'BAJA'].text }]}>
+                {patient.prioridad ?? 'BAJA'}
+              </Text>
+            </View>
+          </View>
+          <View style={[styles.infoRow, { borderBottomWidth: 0, alignItems: 'flex-start', flexDirection: 'column', gap: 8 }]}>
+            <Text style={styles.infoLabel}>Estado</Text>
+            <View style={styles.estadoRow}>
+              {(['PENDIENTE', 'EN_ATENCION', 'FINALIZADO'] as EstadoPaciente[]).map((e) => {
+                const cfg = ESTADO_CONFIG[e];
+                const isActive = (patient.estado ?? 'PENDIENTE') === e;
+                return (
+                  <TouchableOpacity
+                    key={e}
+                    onPress={() => updateEstado(patient.id, e)}
+                    style={[
+                      styles.estadoChip,
+                      isActive && { backgroundColor: cfg.bg, borderColor: cfg.text },
+                    ]}
+                  >
+                    <Text style={[styles.estadoChipText, isActive && { color: cfg.text, fontWeight: '700' }]}>
+                      {cfg.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </View>
+        </View>
+
         <View style={styles.card}>
           <CardTitle icon="❤️" title="Datos de la mascota" />
           <InfoRow label="Nombre" value={patient.nombre} />
@@ -299,5 +350,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textPrimary,
     lineHeight: 20,
+  },
+  chip: {
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    alignSelf: 'center',
+  },
+  chipText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  estadoRow: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    flexWrap: 'wrap',
+  },
+  estadoChip: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: radius.full,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.background,
+  },
+  estadoChipText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textMuted,
   },
 });
