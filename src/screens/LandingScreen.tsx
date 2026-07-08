@@ -35,7 +35,6 @@ export default function LandingScreen({ navigation }: Props) {
 
         <View style={styles.hero}>
           <View style={styles.imageWrapper}>
-            <View style={styles.circleBg} />
             <Image
               source={require('../../assets/killa.png')}
               style={styles.dogImage}
@@ -206,11 +205,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
     zIndex: 2,
   },
   dot1: { top: 8, right: 8 },

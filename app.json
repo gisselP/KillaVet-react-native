@@ -4,11 +4,11 @@
     "slug": "killa-vet",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/killa3d.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/killa.png",
-      "resizeMode": "contain",
+      "image": "./assets/killa3d.png",
+      "resizeMode": "contain",      
       "backgroundColor": "#1D9E75"
     },
     "ios": {
@@ -17,8 +17,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#E1F5EE"
+        "foregroundImage": "./assets/killa3d.png",
+        "backgroundColor": "#1D9E75"
       },
       "package": "com.killavet.app"
     },
