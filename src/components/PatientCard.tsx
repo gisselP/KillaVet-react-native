@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { colors, radius, spacing } from '../theme/colors';
 import { SPECIES_EMOJI } from './SpeciesSelector';
 import { usePatients } from '../context/PatientContext';
+import { useAuth } from '../context/AuthContext';
 import { Patient } from '../types';
 
 const ESTADO_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
@@ -30,8 +31,11 @@ interface Props {
 
 export default function PatientCard({ patient, onPress }: Props) {
   const { deletePatient } = usePatients();
+  const { user } = useAuth();
+  const isOwner = patient.userId === user?.uid;
 
   function handleLongPress() {
+    if (!isOwner) return;
     Alert.alert(
       `Eliminar a ${patient.nombre}`,
       '¿Estás seguro? Esta acción no se puede deshacer.',

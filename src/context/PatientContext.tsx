@@ -6,8 +6,6 @@ import {
   deleteDoc,
   updateDoc,
   getDocs,
-  query,
-  where,
 } from 'firebase/firestore';
 import { firestore } from '../config/firebase';
 import { useAuth } from './AuthContext';
@@ -46,25 +44,22 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     initDatabase();
-    const local = getAllPatients(user.uid);
-    setPatients(local);
+    setPatients(getAllPatients());
     setLoading(false);
-    syncFromFirestore(user.uid);
+    syncFromFirestore();
   }, [user?.uid]);
 
-  async function syncFromFirestore(uid: string) {
+  async function syncFromFirestore() {
     try {
-      const q = query(collection(firestore, 'patients'), where('userId', '==', uid));
-      const snapshot = await getDocs(q);
+      const snapshot = await getDocs(collection(firestore, 'patients'));
       const firestorePatients = snapshot.docs.map((d) => d.data() as Patient);
-
-      const localIds = new Set(getAllPatients(uid).map((p) => p.id));
+      const localIds = new Set(getAllPatients().map((p) => p.id));
       for (const p of firestorePatients) {
         if (!localIds.has(p.id)) {
           insertPatient(p);
         }
       }
-      setPatients(getAllPatients(uid));
+      setPatients(getAllPatients());
     } catch (e) {
       // sin conexión, se usan los datos locales
     }
@@ -89,7 +84,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     };
 
     insertPatient(newPatient);
-    setPatients(getAllPatients(user.uid));
+    setPatients(getAllPatients());
     setDoc(doc(firestore, 'patients', newPatient.id), newPatient).catch(() => {});
 
     return newPatient;
@@ -101,7 +96,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     if (!existing) return;
     const updated: Patient = { ...existing, ...data };
     updatePatientData(updated);
-    setPatients(getAllPatients(user.uid));
+    setPatients(getAllPatients());
     setDoc(doc(firestore, 'patients', id), updated).catch(() => {});
   }
 
@@ -119,7 +114,7 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
   async function deletePatient(id: string): Promise<void> {
     if (!user) return;
     deletePatientById(id);
-    setPatients(getAllPatients(user.uid));
+    setPatients(getAllPatients());
     deleteDoc(doc(firestore, 'patients', id)).catch(() => {});
   }
 

@@ -13,10 +13,9 @@ export function initDatabase(): void {
   `);
 }
 
-export function getAllPatients(userId: string): Patient[] {
+export function getAllPatients(): Patient[] {
   const rows = db.getAllSync(
-    'SELECT data FROM patients WHERE userId = ? ORDER BY rowid DESC',
-    [userId]
+    'SELECT data FROM patients ORDER BY rowid DESC'
   ) as { data: string }[];
   return rows.map((row) => JSON.parse(row.data) as Patient);
 }

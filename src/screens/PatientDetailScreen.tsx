@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RouteProp } from '@react-navigation/native';
 import { usePatients } from '../context/PatientContext';
+import { useAuth } from '../context/AuthContext';
 import { SPECIES_EMOJI } from '../components/SpeciesSelector';
 import { colors, spacing, radius } from '../theme/colors';
 import { RootStackParamList, EstadoPaciente } from '../types';
@@ -35,8 +36,10 @@ type Props = {
 export default function PatientDetailScreen({ navigation, route }: Props) {
   const { patientId } = route.params;
   const { getPatientById, deletePatient, updateEstado } = usePatients();
+  const { user } = useAuth();
 
   const patient = getPatientById(patientId);
+  const isOwner = patient?.userId === user?.uid;
 
   if (!patient) {
     return (
@@ -83,20 +86,24 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Ficha del paciente</Text>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('EditPatient', { patientId: patient.id })}
-            style={styles.editBtn}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.editIcon}>✏️</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleDelete}
-            style={styles.deleteBtn}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          >
-            <Text style={styles.deleteIcon}>🗑️</Text>
-          </TouchableOpacity>
+          {isOwner && (
+            <>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('EditPatient', { patientId: patient.id })}
+                style={styles.editBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.editIcon}>✏️</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={handleDelete}
+                style={styles.deleteBtn}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.deleteIcon}>🗑️</Text>
+              </TouchableOpacity>
+            </>
+          )}
         </View>
 
         <View style={styles.heroSection}>
@@ -113,6 +120,11 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
           <Text style={styles.heroDate}>
             Registrado el {patient.fechaRegistro} · {patient.horaRegistro}
           </Text>
+          <View style={[styles.ownerBadge, isOwner ? styles.ownerBadgeMe : styles.ownerBadgeOther]}>
+            <Text style={styles.ownerBadgeText}>
+              {isOwner ? '👤 Registrado por ti' : '👤 Otro veterinario'}
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -285,7 +297,15 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   heroBadgeText: { fontSize: 13, fontWeight: '600', color: colors.white },
-  heroDate: { fontSize: 12, color: 'rgba(255,255,255,0.7)' },
+  heroDate: { fontSize: 12, color: 'rgba(255,255,255,0.7)', marginBottom: 8 },
+  ownerBadge: {
+    borderRadius: radius.full,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  ownerBadgeMe: { backgroundColor: 'rgba(255,255,255,0.25)' },
+  ownerBadgeOther: { backgroundColor: 'rgba(0,0,0,0.2)' },
+  ownerBadgeText: { fontSize: 11, color: colors.white, fontWeight: '600' },
   scrollContent: { paddingTop: spacing.md, paddingBottom: spacing.xxxl },
   card: {
     backgroundColor: colors.white,
