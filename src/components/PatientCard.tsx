@@ -17,7 +17,7 @@ const PRIORIDAD_CONFIG: Record<string, { bg: string; text: string }> = {
   MEDIA: { bg: '#FEF3C7', text: '#92400E' },
   ALTA:  { bg: '#FEE2E2', text: '#991B1B' },
 };
-
+// Colores para el borde indicador del estado de la tarjeta
 const ESTADO_BORDER: Record<string, string> = {
   PENDIENTE:   '#D97706',
   EN_ATENCION: '#3B82F6',
