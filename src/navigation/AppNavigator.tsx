@@ -38,7 +38,6 @@ export default function AppNavigator() {
         }}
       >
         {user ? (
-          // Pantallas protegidas — solo accesibles con sesión iniciada
           <>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="RegisterPatient" component={RegisterPatientScreen} />
@@ -47,7 +46,6 @@ export default function AppNavigator() {
             <Stack.Screen name="Profile" component={ProfileScreen} />
           </>
         ) : (
-          // Pantallas públicas
           <>
             <Stack.Screen name="Landing" component={LandingScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />

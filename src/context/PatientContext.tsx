@@ -45,13 +45,10 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
-    // Inicializar SQLite y cargar datos locales
     initDatabase();
     const local = getAllPatients(user.uid);
     setPatients(local);
     setLoading(false);
-
-    // Sincronizar desde Firestore en segundo plano
     syncFromFirestore(user.uid);
   }, [user?.uid]);
 
@@ -61,18 +58,15 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       const snapshot = await getDocs(q);
       const firestorePatients = snapshot.docs.map((d) => d.data() as Patient);
 
-      // Insertar en SQLite los que no existen localmente
       const localIds = new Set(getAllPatients(uid).map((p) => p.id));
       for (const p of firestorePatients) {
         if (!localIds.has(p.id)) {
           insertPatient(p);
         }
       }
-
-      // Recargar desde SQLite
       setPatients(getAllPatients(uid));
     } catch (e) {
-      // Sin conexión o Firebase no configurado — continuar con datos locales
+      // sin conexión, se usan los datos locales
     }
   }
 
@@ -94,11 +88,8 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
       }),
     };
 
-    // Guardar en SQLite (local, inmediato)
     insertPatient(newPatient);
     setPatients(getAllPatients(user.uid));
-
-    // Sincronizar a Firestore (nube, en segundo plano)
     setDoc(doc(firestore, 'patients', newPatient.id), newPatient).catch(() => {});
 
     return newPatient;
@@ -120,7 +111,6 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     const patient = updated.find((p) => p.id === id);
     if (patient) {
       updatePatientData(patient);
-      // Sync a Firestore
       updateDoc(doc(firestore, 'patients', id), { estado }).catch(() => {});
     }
     setPatients(updated);
@@ -130,7 +120,6 @@ export function PatientProvider({ children }: { children: React.ReactNode }) {
     if (!user) return;
     deletePatientById(id);
     setPatients(getAllPatients(user.uid));
-    // Sync a Firestore
     deleteDoc(doc(firestore, 'patients', id)).catch(() => {});
   }
 

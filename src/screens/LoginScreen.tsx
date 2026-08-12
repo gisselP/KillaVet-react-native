@@ -47,7 +47,6 @@ export default function LoginScreen({ navigation }: Props) {
     setCargando(true);
     try {
       await login(email.trim(), contrasena);
-      // AppNavigator detecta el cambio de sesión y redirige automáticamente
     } catch (e: any) {
       const msg =
         e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential'

@@ -35,14 +35,13 @@ export default function HomeScreen({ navigation }: Props) {
   const [search, setSearch] = useState('');
   const [filtroEstado, setFiltroEstado] = useState('TODOS');
 
-  // API REST — Razas de perros
   const [breeds, setBreeds] = useState<string[]>([]);
   const [breedsLoading, setBreedsLoading] = useState(true);
   const [breedsError, setBreedsError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDogBreeds().then(({ breeds: b, error }) => {
-      setBreeds(b.slice(0, 18)); // mostrar 18 razas
+      setBreeds(b.slice(0, 18));
       setBreedsError(error);
       setBreedsLoading(false);
     });
@@ -61,7 +60,6 @@ export default function HomeScreen({ navigation }: Props) {
   function renderHeader() {
     return (
       <>
-        {/* Header verde */}
         <View style={styles.greenHeader}>
           <View style={styles.topbar}>
             <Text style={styles.logo}>
@@ -90,7 +88,6 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        {/* Stats */}
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.statNum}>{patients.length}</Text>
@@ -106,7 +103,6 @@ export default function HomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        {/* Sección API REST — Razas de perros */}
         <View style={styles.breedsSection}>
           <Text style={styles.breedsSectionTitle}>🐕 Razas disponibles</Text>
           <Text style={styles.breedsSectionSub}>Vía Dog CEO API</Text>
@@ -129,7 +125,6 @@ export default function HomeScreen({ navigation }: Props) {
           )}
         </View>
 
-        {/* Buscador */}
         <View style={styles.searchContainer}>
           <Text style={styles.searchIcon}>🔍</Text>
           <TextInput
@@ -148,7 +143,6 @@ export default function HomeScreen({ navigation }: Props) {
           )}
         </View>
 
-        {/* Filtros */}
         <View style={styles.filtersRow}>
           {FILTROS.map((f) => (
             <TouchableOpacity

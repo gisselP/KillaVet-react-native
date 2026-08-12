@@ -52,7 +52,6 @@ export default function RegisterScreen({ navigation }: Props) {
     setCargando(true);
     try {
       await register(email.trim(), password);
-      // onAuthStateChanged en AppNavigator redirige automáticamente
     } catch (e: any) {
       const msg =
         e.code === 'auth/email-already-in-use'

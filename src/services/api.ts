@@ -1,6 +1,3 @@
-// Dog CEO API — https://dog.ceo/dog-api/
-// Usada para mostrar razas de perros disponibles en la clínica
-
 export interface BreedsResult {
   breeds: string[];
   error: string | null;
