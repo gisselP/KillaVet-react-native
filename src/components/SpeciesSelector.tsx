@@ -20,7 +20,7 @@ const SPECIES: Species[] = [
 export const SPECIES_EMOJI: Record<string, string> = Object.fromEntries(
   SPECIES.map((s) => [s.value, s.emoji])
 );
-
+// Especie actualmente seleccionada
 interface Props {
   value: string;
   onChange: (value: string) => void;
