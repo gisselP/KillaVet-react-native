@@ -5,7 +5,7 @@ import { colors, radius } from '../theme/colors';
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
 // Definición de los tamaños disponibles para el botón
 type Size = 'sm' | 'md' | 'lg';
-
+// Interfaz para definir las propiedades (Props) que acepta el componente
 interface Props {
   title: string;
   onPress: () => void;
