@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors, radius, spacing } from '../theme/colors';
-
+// Interfaz para estructurar los datos de cada opción de especie
 interface Species {
   label: string;
   emoji: string;
