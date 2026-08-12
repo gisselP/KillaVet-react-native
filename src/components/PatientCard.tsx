@@ -5,7 +5,7 @@ import { SPECIES_EMOJI } from './SpeciesSelector';
 import { usePatients } from '../context/PatientContext';
 import { useAuth } from '../context/AuthContext';
 import { Patient } from '../types';
-
+// Configuración de estilos visuales (fondos, texto y etiquetas) según el estado de la atención
 const ESTADO_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
   PENDIENTE:   { bg: '#FEF3C7', text: '#92400E', label: 'PENDIENTE' },
   EN_ATENCION: { bg: '#DBEAFE', text: '#1E40AF', label: 'EN ATENCIÓN' },
