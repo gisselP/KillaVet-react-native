@@ -16,7 +16,7 @@ const SPECIES: Species[] = [
   { label: 'Hamster', emoji: '🐹', value: 'Hamster' },
   { label: 'Otro', emoji: '🐾', value: 'Otro' },
 ];
-
+// Mapa clave-valor exportado ({ 'Perro': '🐶', ... }) para obtener rápido el emoji según la especie
 export const SPECIES_EMOJI: Record<string, string> = Object.fromEntries(
   SPECIES.map((s) => [s.value, s.emoji])
 );
