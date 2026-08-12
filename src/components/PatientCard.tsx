@@ -11,7 +11,7 @@ const ESTADO_CONFIG: Record<string, { bg: string; text: string; label: string }>
   EN_ATENCION: { bg: '#DBEAFE', text: '#1E40AF', label: 'EN ATENCIÓN' },
   FINALIZADO:  { bg: '#E1F5EE', text: '#0F6E56', label: 'FINALIZADO' },
 };
-
+// Configuración de colores (fondo y texto) según el nivel de prioridad médica
 const PRIORIDAD_CONFIG: Record<string, { bg: string; text: string }> = {
   BAJA:  { bg: '#F3F4F6', text: '#6B7280' },
   MEDIA: { bg: '#FEF3C7', text: '#92400E' },
