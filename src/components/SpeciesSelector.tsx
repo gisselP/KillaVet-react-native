@@ -7,7 +7,7 @@ interface Species {
   emoji: string;
   value: string;
 }
-
+// Lista estática de especies disponibles para seleccionar
 const SPECIES: Species[] = [
   { label: 'Perro', emoji: '🐶', value: 'Perro' },
   { label: 'Gato', emoji: '🐱', value: 'Gato' },
