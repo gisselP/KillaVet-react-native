@@ -19,7 +19,7 @@ import {
 } from '../services/database';
 
 export type PatientInput = Omit<Patient, 'id' | 'userId' | 'fechaRegistro' | 'horaRegistro'>;
-
+//El núcleo del CRUD. Guarda en SQLite de inmediato y sincroniza a Firestore
 interface PatientContextType {
   patients: Patient[];
   loading: boolean;

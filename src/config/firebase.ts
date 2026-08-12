@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-
+//configuración del proyecto — Authentication y Firestore
 const firebaseConfig = {
   apiKey: "AIzaSyB-xrfQbtJfNSBJosfR4fF2pgblz8oXRHg",
   authDomain: "killavet-app.firebaseapp.com",

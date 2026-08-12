@@ -7,7 +7,7 @@ import {
   User,
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
-
+//maneja toda la autenticación. 
 interface AuthContextType {
   user: User | null;
   loadingAuth: boolean;

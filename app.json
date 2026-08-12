@@ -27,6 +27,12 @@
     },
     "plugins": [
       "expo-sqlite"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "8a6f0155-12ef-41cf-b8c6-866a4c50504b"
+      }
+    },
+    "owner": "tuterrors-team"
   }
 }
