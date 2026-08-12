@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TextInputProps, ViewStyle } from 'react-native';
 import { colors, radius, spacing } from '../theme/colors';
-
+/ Interfaz para definir las propiedades (Props) del componente de entrada de texto.
+// Extiende de 'TextInputProps' para heredar todas las propiedades nativas de un TextInput.
 interface Props extends TextInputProps {
   label?: string;
   required?: boolean;
