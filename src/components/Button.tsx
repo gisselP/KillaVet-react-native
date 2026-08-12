@@ -33,8 +33,8 @@ export default function Button({
       activeOpacity={0.75}
       style={[
         styles.base,
-        styles[variant],
-        styles[`size_${size}` as keyof typeof styles],
+        styles[variant] as ViewStyle,
+        styles[`size_${size}` as keyof typeof styles] as ViewStyle,
         isDisabled && styles.disabled,
         style,
       ]}

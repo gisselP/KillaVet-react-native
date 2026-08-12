@@ -78,11 +78,11 @@ export default function LandingScreen({ navigation }: Props) {
         <View style={styles.actions}>
           <TouchableOpacity
             style={styles.btnPrimary}
-            onPress={() => navigation.navigate('RegisterPatient')}
+            onPress={() => navigation.navigate('Register')}
             activeOpacity={0.82}
           >
             <Text style={styles.btnPrimaryIcon}>🗓️</Text>
-            <Text style={styles.btnPrimaryText}>Agendar una cita</Text>
+            <Text style={styles.btnPrimaryText}>Crear cuenta</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -90,7 +90,7 @@ export default function LandingScreen({ navigation }: Props) {
             onPress={() => navigation.navigate('Login')}
             activeOpacity={0.82}
           >
-            <Text style={styles.btnOutlineText}>Acceso veterinario  →</Text>
+            <Text style={styles.btnOutlineText}>Iniciar sesión  →</Text>
           </TouchableOpacity>
         </View>
 

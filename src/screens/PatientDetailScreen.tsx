@@ -33,15 +33,27 @@ type Props = {
 };
 
 export default function PatientDetailScreen({ navigation, route }: Props) {
-  const { patient: paramPatient } = route.params;
-  const { patients, deletePatient, updateEstado } = usePatients();
+  const { patientId } = route.params;
+  const { getPatientById, deletePatient, updateEstado } = usePatients();
 
-  // Leer el paciente en vivo para que los cambios de estado se reflejen al instante
-  const patient = patients.find((p) => p.id === paramPatient.id) ?? paramPatient;
+  const patient = getPatientById(patientId);
+
+  if (!patient) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top', 'bottom']}>
+        <View style={styles.notFound}>
+          <Text style={styles.notFoundText}>Paciente no encontrado</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.notFoundBack}>← Volver</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   function handleDelete() {
     Alert.alert(
-      `Eliminar a ${patient.nombre}`,
+      `Eliminar a ${patient!.nombre}`,
       '¿Estás seguro? Esta acción no se puede deshacer.',
       [
         { text: 'Cancelar', style: 'cancel' },
@@ -49,7 +61,7 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
           text: 'Eliminar',
           style: 'destructive',
           onPress: () => {
-            deletePatient(patient.id);
+            deletePatient(patient!.id);
             navigation.goBack();
           },
         },
@@ -71,6 +83,13 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
             <Text style={styles.backArrow}>←</Text>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>Ficha del paciente</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('EditPatient', { patientId: patient.id })}
+            style={styles.editBtn}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.editIcon}>✏️</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             onPress={handleDelete}
             style={styles.deleteBtn}
@@ -198,13 +217,11 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  greenHeader: {
-    backgroundColor: colors.primary,
-  },
+  safeArea: { flex: 1, backgroundColor: colors.background },
+  notFound: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
+  notFoundText: { fontSize: 16, color: colors.textMuted },
+  notFoundBack: { fontSize: 14, color: colors.primary, fontWeight: '600' },
+  greenHeader: { backgroundColor: colors.primary },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -220,18 +237,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backArrow: {
-    fontSize: 20,
-    color: colors.white,
-    fontWeight: '300',
+  backArrow: { fontSize: 20, color: colors.white, fontWeight: '300' },
+  headerTitle: { flex: 1, textAlign: 'center', fontSize: 17, fontWeight: '600', color: colors.white },
+  editBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: radius.full,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 6,
   },
-  headerTitle: {
-    flex: 1,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '600',
-    color: colors.white,
-  },
+  editIcon: { fontSize: 16 },
   deleteBtn: {
     width: 36,
     height: 36,
@@ -259,12 +276,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   avatarEmoji: { fontSize: 44 },
-  heroName: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: colors.white,
-    marginBottom: spacing.sm,
-  },
+  heroName: { fontSize: 26, fontWeight: '800', color: colors.white, marginBottom: spacing.sm },
   heroBadge: {
     backgroundColor: 'rgba(255,255,255,0.2)',
     borderRadius: radius.full,
@@ -272,19 +284,9 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     marginBottom: spacing.sm,
   },
-  heroBadgeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  heroDate: {
-    fontSize: 12,
-    color: 'rgba(255,255,255,0.7)',
-  },
-  scrollContent: {
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xxxl,
-  },
+  heroBadgeText: { fontSize: 13, fontWeight: '600', color: colors.white },
+  heroDate: { fontSize: 12, color: 'rgba(255,255,255,0.7)' },
+  scrollContent: { paddingTop: spacing.md, paddingBottom: spacing.xxxl },
   card: {
     backgroundColor: colors.white,
     borderRadius: radius.lg,
@@ -322,22 +324,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: colors.borderLight,
   },
-  infoLabel: {
-    flex: 1,
-    fontSize: 13,
-    color: colors.textMuted,
-    fontWeight: '500',
-  },
-  infoValue: {
-    flex: 2,
-    fontSize: 14,
-    color: colors.textPrimary,
-    fontWeight: '500',
-    textAlign: 'right',
-  },
-  noteBlock: {
-    marginBottom: spacing.md,
-  },
+  infoLabel: { flex: 1, fontSize: 13, color: colors.textMuted, fontWeight: '500' },
+  infoValue: { flex: 2, fontSize: 14, color: colors.textPrimary, fontWeight: '500', textAlign: 'right' },
+  noteBlock: { marginBottom: spacing.md },
   noteLabel: {
     fontSize: 12,
     fontWeight: '600',
@@ -346,26 +335,10 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.3,
   },
-  noteText: {
-    fontSize: 14,
-    color: colors.textPrimary,
-    lineHeight: 20,
-  },
-  chip: {
-    borderRadius: radius.full,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    alignSelf: 'center',
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  estadoRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
-    flexWrap: 'wrap',
-  },
+  noteText: { fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
+  chip: { borderRadius: radius.full, paddingHorizontal: 12, paddingVertical: 4, alignSelf: 'center' },
+  chipText: { fontSize: 12, fontWeight: '700' },
+  estadoRow: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap' },
   estadoChip: {
     paddingHorizontal: 14,
     paddingVertical: 8,
@@ -374,9 +347,5 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     backgroundColor: colors.background,
   },
-  estadoChipText: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: colors.textMuted,
-  },
+  estadoChipText: { fontSize: 12, fontWeight: '500', color: colors.textMuted },
 });

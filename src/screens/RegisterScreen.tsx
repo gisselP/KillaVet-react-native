@@ -7,7 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Image,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -18,45 +18,48 @@ import { RootStackParamList } from '../types';
 import { useAuth } from '../context/AuthContext';
 
 type Props = {
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Login'>;
+  navigation: NativeStackNavigationProp<RootStackParamList, 'Register'>;
 };
 
-type Errores = {
+interface Errores {
   email?: string;
-  contrasena?: string;
+  password?: string;
+  confirm?: string;
   general?: string;
-};
+}
 
-export default function LoginScreen({ navigation }: Props) {
-  const { login } = useAuth();
+export default function RegisterScreen({ navigation }: Props) {
+  const { register } = useAuth();
   const [email, setEmail] = useState('');
-  const [contrasena, setContrasena] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [errores, setErrores] = useState<Errores>({});
   const [cargando, setCargando] = useState(false);
 
   function validar(): boolean {
     const e: Errores = {};
     if (!email.trim()) e.email = 'El correo es obligatorio';
-    if (!contrasena.trim()) e.contrasena = 'La contraseña es obligatoria';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Correo inválido';
+    if (!password) e.password = 'La contraseña es obligatoria';
+    else if (password.length < 6) e.password = 'Mínimo 6 caracteres';
+    if (password !== confirm) e.confirm = 'Las contraseñas no coinciden';
     setErrores(e);
     return Object.keys(e).length === 0;
   }
 
-  async function handleLogin() {
+  async function handleRegister() {
     if (!validar()) return;
     setCargando(true);
     try {
-      await login(email.trim(), contrasena);
-      // AppNavigator detecta el cambio de sesión y redirige automáticamente
+      await register(email.trim(), password);
+      // onAuthStateChanged en AppNavigator redirige automáticamente
     } catch (e: any) {
       const msg =
-        e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential'
-          ? 'Correo o contraseña incorrectos'
+        e.code === 'auth/email-already-in-use'
+          ? 'Este correo ya está registrado'
           : e.code === 'auth/invalid-email'
           ? 'Correo inválido'
-          : e.code === 'auth/too-many-requests'
-          ? 'Demasiados intentos. Intenta más tarde.'
-          : 'Error al iniciar sesión. Intenta de nuevo.';
+          : 'Error al registrar. Intenta de nuevo.';
       setErrores({ general: msg });
     } finally {
       setCargando(false);
@@ -65,10 +68,7 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
@@ -82,20 +82,16 @@ export default function LoginScreen({ navigation }: Props) {
             >
               <Text style={styles.backArrow}>←</Text>
             </TouchableOpacity>
-            <Text style={styles.headerTitle}>Acceso veterinario</Text>
+            <Text style={styles.headerTitle}>Crear cuenta</Text>
             <View style={{ width: 36 }} />
           </View>
 
-          <View style={styles.imageSection}>
-            <View style={styles.imageCircle}>
-              <Image
-                source={require('../../assets/killa-2.png')}
-                style={styles.vetImage}
-                resizeMode="contain"
-              />
+          <View style={styles.topSection}>
+            <View style={styles.iconCircle}>
+              <Text style={styles.iconEmoji}>🐾</Text>
             </View>
-            <Text style={styles.welcomeText}>¡Hola, doc! 👋</Text>
-            <Text style={styles.welcomeSub}>Ingresa tus credenciales para continuar</Text>
+            <Text style={styles.welcomeText}>Únete a Killa Vet</Text>
+            <Text style={styles.welcomeSub}>Crea tu cuenta para comenzar</Text>
           </View>
 
           <View style={styles.card}>
@@ -108,10 +104,7 @@ export default function LoginScreen({ navigation }: Props) {
             <InputField
               label="Correo electrónico"
               value={email}
-              onChangeText={(t) => {
-                setEmail(t);
-                if (errores.email || errores.general) setErrores({});
-              }}
+              onChangeText={(t) => { setEmail(t); if (errores.email || errores.general) setErrores({}); }}
               placeholder="correo@ejemplo.com"
               keyboardType="email-address"
               autoCapitalize="none"
@@ -122,35 +115,41 @@ export default function LoginScreen({ navigation }: Props) {
 
             <InputField
               label="Contraseña"
-              value={contrasena}
-              onChangeText={(t) => {
-                setContrasena(t);
-                if (errores.contrasena || errores.general) setErrores({});
-              }}
-              placeholder="Tu contraseña"
+              value={password}
+              onChangeText={(t) => { setPassword(t); if (errores.password || errores.general) setErrores({}); }}
+              placeholder="Mínimo 6 caracteres"
               secureTextEntry
               autoCapitalize="none"
               autoCorrect={false}
               required
-              error={errores.contrasena}
+              error={errores.password}
+            />
+
+            <InputField
+              label="Confirmar contraseña"
+              value={confirm}
+              onChangeText={(t) => { setConfirm(t); if (errores.confirm) setErrores({}); }}
+              placeholder="Repite tu contraseña"
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              required
+              error={errores.confirm}
             />
 
             <Button
-              title="Ingresar"
-              onPress={handleLogin}
+              title="Crear cuenta"
+              onPress={handleRegister}
               size="lg"
               loading={cargando}
-              style={styles.loginBtn}
+              style={styles.registerBtn}
             />
           </View>
 
-          <TouchableOpacity
-            style={styles.registerLink}
-            onPress={() => navigation.navigate('Register')}
-          >
-            <Text style={styles.registerLinkText}>
-              ¿No tienes cuenta?{' '}
-              <Text style={styles.registerLinkBold}>Regístrate aquí</Text>
+          <TouchableOpacity style={styles.loginLink} onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.loginLinkText}>
+              ¿Ya tienes cuenta?{' '}
+              <Text style={styles.loginLinkBold}>Inicia sesión</Text>
             </Text>
           </TouchableOpacity>
         </ScrollView>
@@ -186,17 +185,17 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: colors.white,
   },
-  imageSection: { alignItems: 'center', paddingVertical: 32 },
-  imageCircle: {
-    width: 130,
-    height: 130,
-    borderRadius: 65,
+  topSection: { alignItems: 'center', paddingVertical: 32 },
+  iconCircle: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 16,
   },
-  vetImage: { width: 110, height: 110 },
+  iconEmoji: { fontSize: 44 },
   welcomeText: {
     fontSize: 22,
     fontWeight: '700',
@@ -221,8 +220,8 @@ const styles = StyleSheet.create({
     borderColor: colors.error,
   },
   errorBannerText: { fontSize: 13, color: colors.error, fontWeight: '500' },
-  loginBtn: { marginTop: 8, borderRadius: radius.lg },
-  registerLink: { alignItems: 'center', marginTop: spacing.xl },
-  registerLinkText: { fontSize: 14, color: colors.textMuted },
-  registerLinkBold: { color: colors.primary, fontWeight: '700' },
+  registerBtn: { marginTop: 8, borderRadius: radius.lg },
+  loginLink: { alignItems: 'center', marginTop: spacing.xl },
+  loginLinkText: { fontSize: 14, color: colors.textMuted },
+  loginLinkBold: { color: colors.primary, fontWeight: '700' },
 });

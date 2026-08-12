@@ -8,7 +8,7 @@
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/killa3d.png",
-      "resizeMode": "contain",      
+      "resizeMode": "contain",
       "backgroundColor": "#1D9E75"
     },
     "ios": {
@@ -25,6 +25,8 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": []
+    "plugins": [
+      "expo-sqlite"
+    ]
   }
 }

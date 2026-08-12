@@ -12,6 +12,7 @@ export const TIPOS_SERVICIO = [
 
 export interface Patient {
   id: string;
+  userId: string;
   especie: string;
   nombre: string;
   raza: string;
@@ -35,7 +36,10 @@ export interface Patient {
 export type RootStackParamList = {
   Landing: undefined;
   Login: undefined;
+  Register: undefined;
   Home: undefined;
   RegisterPatient: undefined;
-  PatientDetail: { patient: Patient };
+  PatientDetail: { patientId: string };
+  EditPatient: { patientId: string };
+  Profile: undefined;
 };
