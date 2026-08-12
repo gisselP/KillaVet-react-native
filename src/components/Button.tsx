@@ -3,6 +3,7 @@ import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, ViewStyle } from
 import { colors, radius } from '../theme/colors';
 // Definición de las variantes visuales del botón
 type Variant = 'primary' | 'secondary' | 'ghost' | 'danger';
+// Definición de los tamaños disponibles para el botón
 type Size = 'sm' | 'md' | 'lg';
 
 interface Props {
