@@ -152,10 +152,11 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
                 return (
                   <TouchableOpacity
                     key={e}
-                    onPress={() => updateEstado(patient.id, e)}
+                    onPress={() => isOwner && updateEstado(patient.id, e)}
                     style={[
                       styles.estadoChip,
                       isActive && { backgroundColor: cfg.bg, borderColor: cfg.text },
+                      !isOwner && { opacity: 0.5 },
                     ]}
                   >
                     <Text style={[styles.estadoChipText, isActive && { color: cfg.text, fontWeight: '700' }]}>
@@ -165,6 +166,9 @@ export default function PatientDetailScreen({ navigation, route }: Props) {
                 );
               })}
             </View>
+            {!isOwner && (
+              <Text style={styles.readOnlyText}>Solo el veterinario que registró este paciente puede cambiar el estado.</Text>
+            )}
           </View>
         </View>
 
@@ -368,4 +372,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   estadoChipText: { fontSize: 12, fontWeight: '500', color: colors.textMuted },
+  readOnlyText: { fontSize: 11, color: colors.textMuted, fontStyle: 'italic', marginTop: 4 },
 });
